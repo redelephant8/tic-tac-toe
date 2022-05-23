@@ -33,13 +33,17 @@ class Board < Player
         end
     end
 
-    def startGame
-        printBoard()
+    def switchPlayer()
         if @current == 2
             @current = 1
         else
             @current = 2
         end
+    end
+
+    def startGame
+        printBoard()
+        switchPlayer()
         puts "Player #{@current} enter a square: "
         @current == 1 ? getSquare(gets.chomp.to_i, @@player1.symbol) : getSquare(gets.chomp.to_i, @@player2.symbol)
         if checkWin == true
@@ -60,6 +64,7 @@ class Board < Player
     end
 
     def printBoard()
+        puts "\n"
         for i in 0..2
             for j in 0..2
                 print " #{@board[i][j]} "
@@ -70,29 +75,32 @@ class Board < Player
                 end
             end
         end
+        puts "\n"
     end
 
     def getSquare(num, symbol)
         case num
         when 1
-            (@board[0][0] = symbol)
+            @board[0][0].is_a?(Integer) == true ? @board[0][0] = symbol : switchPlayer()
         when 2
-            (@board[0][1] = symbol)
+            @board[0][1].is_a?(Integer) == true ? @board[0][1] = symbol : switchPlayer()
         when 3
-            (@board[0][2] = symbol)
+            @board[0][2].is_a?(Integer) == true ? @board[0][2] = symbol : switchPlayer()
         when 4
-            (@board[1][0] = symbol)
+            @board[1][0].is_a?(Integer) == true ? @board[1][0] = symbol : switchPlayer()
         when 5
-            (@board[1][1] = symbol)
+            @board[1][1].is_a?(Integer) == true ? @board[1][1] = symbol : switchPlayer()
         when 6
-            (@board[1][2] = symbol)
+            @board[1][2].is_a?(Integer) == true ? @board[1][2] = symbol : switchPlayer()
         when 7
-            (@board[2][0] = symbol)
+            @board[2][0].is_a?(Integer) == true ? @board[2][0] = symbol : switchPlayer()
         when 8
-            (@board[2][1] = symbol)
+            @board[2][1].is_a?(Integer) == true ? @board[2][1] = symbol : switchPlayer()
         when 9
-            (@board[2][2] = symbol)
-        end
+            @board[2][2].is_a?(Integer) == true ? @board[2][2] = symbol : switchPlayer()
+        else
+            switchPlayer
+    end
     end
 
     def checkWin()
