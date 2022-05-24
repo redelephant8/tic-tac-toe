@@ -20,6 +20,7 @@ class Board
     end
 
     def gameLoop
+        printBoard()
         while (@state == 0)
             startGame
         end
@@ -29,7 +30,7 @@ class Board
             @counter += 1
             @games[@counter] = Board.new(@games, @counter, Player.new('x'), Player.new('o'))
         else
-            puts "Thanks for Playing!"
+            puts "Thank you to Playing!"
         end
     end
 
@@ -51,12 +52,12 @@ class Board
     end
 
     def startGame
-        printBoard()
         switchPlayer(error = 'none')
         puts "----------------------"
         puts "Player #{@current} enter a square: "
         @current == 1 ? getSquare(gets.chomp.to_i, @player1.symbol) : getSquare(gets.chomp.to_i, @player2.symbol)
-        if checkWin == true
+        printBoard()
+        if checkWin(@board) == true
             win(@current)
         end
         if @state == 0
@@ -65,10 +66,13 @@ class Board
                 puts "The game has ended in a tie!"
             end
         end
+        if checkTie == true
+            @state = 2
+            puts "Deadlock. No player can win the game."
+        end
     end
 
     def win(winner)
-        printBoard()
         puts "Player #{winner} has won the game!"
         @state = 1
     end
@@ -87,6 +91,32 @@ class Board
         end
         puts "\n"
     end
+
+    def checkTie
+        @tie = false
+        temp = Marshal.load(Marshal.dump(@board))
+        for i in 0..2
+            for j in 0..2
+                if @board[i][j].is_a?(Integer) == true
+                    temp[i][j] = @player1.symbol
+                end
+            end
+        end
+        @tie = true if checkWin(temp) == false
+        temp = Marshal.load(Marshal.dump(@board))
+        for i in 0..2
+            for j in 0..2
+                if @board[i][j].is_a?(Integer) == true
+                    temp[i][j] = @player2.symbol
+                end
+            end
+        end
+        if checkWin(temp) == true
+            @tie = false
+        end
+        @tie
+    end
+
 
     def getSquare(num, symbol)
         error = 'full'
@@ -114,17 +144,17 @@ class Board
     end
     end
 
-    def checkWin()
+    def checkWin(board)
         game_status = false
         for i in 0..2
             for j in 0..2
-                if @board[i][0] == @board[i][1] && @board[i][1] == @board[i][2]
+                if board[i][0] == board[i][1] && board[i][1] == board[i][2]
                     game_status = true
-                elsif @board[0][j] == @board[1][j] && @board[1][j] == @board[2][j]
+                elsif board[0][j] == board[1][j] && board[1][j] == board[2][j]
                     game_status = true
-                elsif @board[0][0] == @board[1][1] && @board[1][1] == @board[2][2]
+                elsif board[0][0] == board[1][1] && board[1][1] == board[2][2]
                     game_status = true
-                elsif @board[0][2] == @board[1][1] && @board[1][1] == @board[2][0]
+                elsif board[0][2] == board[1][1] && board[1][1] == board[2][0]
                     game_status = true
                 end
             end
