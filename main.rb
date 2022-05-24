@@ -99,6 +99,8 @@ class Board < Player
         when 9
             @board[2][2].is_a?(Integer) == true ? @board[2][2] = symbol : switchPlayer()
         else
+            puts "Invalid Entry"
+            puts "\n"
             switchPlayer
     end
     end
