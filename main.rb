@@ -6,9 +6,9 @@ class Player
 end
 
 class Board < Player
-    @@player1 = Player.new('x')
-    @@player2 = Player.new('o')
-    def initialize(games, counter)
+    def initialize(games, counter, player1, player2)
+        @player1 = player1
+        @player2 = player2
         @counter = counter
         @games = games
         puts "Welcome to Game #{@counter + 1}"
@@ -27,7 +27,7 @@ class Board < Player
         @answer = gets.chomp
         if (@answer == 'y')
             @counter += 1
-            @games[@counter] = Board.new(@games, @counter)
+            @games[@counter] = Board.new(@games, @counter, Player.new('x'), Player.new('o'))
         else
             puts "Thanks for Playing!"
         end
@@ -45,7 +45,7 @@ class Board < Player
         printBoard()
         switchPlayer()
         puts "Player #{@current} enter a square: "
-        @current == 1 ? getSquare(gets.chomp.to_i, @@player1.symbol) : getSquare(gets.chomp.to_i, @@player2.symbol)
+        @current == 1 ? getSquare(gets.chomp.to_i, @player1.symbol) : getSquare(gets.chomp.to_i, @player2.symbol)
         if checkWin == true
             win(@current)
         end
@@ -138,4 +138,7 @@ puts "\n"
 
 games = Array.new
 
-games[0] = Board.new(games, 0)
+player1 = Player.new('x')
+player2 = Player.new('o')
+
+games[0] = Board.new(games, 0, player1, player2)
