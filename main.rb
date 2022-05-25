@@ -20,6 +20,8 @@ class Board
     end
 
     def gameLoop
+        puts "Do you want to play a 1 player game or a 2 player game? (1/2)"
+        @gameType = gets.chomp.to_i
         printBoard()
         while (@state == 0)
             startGame
@@ -54,8 +56,14 @@ class Board
     def startGame
         switchPlayer(error = 'none')
         puts "----------------------"
-        puts "Player #{@current} enter a square: "
-        @current == 1 ? getSquare(gets.chomp.to_i, @player1.symbol) : getSquare(gets.chomp.to_i, @player2.symbol)
+        if @gameType == 2 || @current == 1
+            puts "Player #{@current} enter a square: "
+        end
+        if @gameType == 2
+            @current == 1 ? getSquare(gets.chomp.to_i, @player1.symbol) : getSquare(gets.chomp.to_i, @player2.symbol)
+        else
+            @current == 1 ? getSquare(gets.chomp.to_i, @player1.symbol) : computerPlay()
+        end
         printBoard()
         if checkWin(@board) == true
             win(@current)
@@ -66,7 +74,7 @@ class Board
                 puts "The game has ended in a tie!"
             end
         end
-        if checkTie == true
+        if checkTie == true && @state == 0
             @state = 2
             puts "Deadlock. No player can win the game."
         end
@@ -78,6 +86,7 @@ class Board
     end
 
     def printBoard()
+        sleep(1)
         puts "\n"
         for i in 0..2
             for j in 0..2
@@ -102,7 +111,9 @@ class Board
                 end
             end
         end
-        @tie = true if checkWin(temp) == false
+        if checkWin(temp) == false
+            @tie = true
+        end
         temp = Marshal.load(Marshal.dump(@board))
         for i in 0..2
             for j in 0..2
@@ -116,32 +127,91 @@ class Board
         end
         @tie
     end
+    
+    def checkFree(square)
+        @flag = false
+        for i in 0..2
+            for j in 0..2
+                if square == @board[i][j]
+                    @flag = true
+                end
+            end
+        end
+        @flag
+    end
 
+    def computerPlay
+        counter = 0
+        for i in 0..2
+            for j in 0..2
+                @tempBoard = Marshal.load(Marshal.dump(@board))
+                if @board[i][j].is_a?(Integer)
+                    @squareNum = @board[i][j]
+                    @tempBoard[i][j] = @player1.symbol
+                        if checkWin(@tempBoard) == true
+                        @possiblePlays = @squareNum
+                        counter += 1
+                        break
+                    end
+                end
+            end
+        end
+
+            available = false
+            if checkFree(@possiblePlays) == true
+                available = true
+                @finalPlay = @possiblePlays
+            end
+        computerFinal(@finalPlay)
+    end
+
+
+    def computerFinal(finalPlay)
+        if finalPlay.is_a?(Integer)
+            getSquare(finalPlay, 'o')
+        else
+            available = false
+            while (available == false)
+                finalPlay = rand(1..9)
+                if checkFree(finalPlay) == true
+                    available = true
+                end
+            end
+        getSquare(finalPlay, 'o')
+        end
+        sleep(1)
+        puts "The computer has put an 'o' in square #{finalPlay}"
+    end
 
     def getSquare(num, symbol)
-        error = 'full'
         case num
         when 1
-            @board[0][0].is_a?(Integer) == true ? @board[0][0] = symbol : switchPlayer(error)
+            @board[0][0].is_a?(Integer) == true ? @board[0][0] = symbol : squareUnavailable
         when 2
-            @board[0][1].is_a?(Integer) == true ? @board[0][1] = symbol : switchPlayer(error)
+            @board[0][1].is_a?(Integer) == true ? @board[0][1] = symbol : squareUnavailable
         when 3
-            @board[0][2].is_a?(Integer) == true ? @board[0][2] = symbol : switchPlayer(error)
+            @board[0][2].is_a?(Integer) == true ? @board[0][2] = symbol : squareUnavailable
         when 4
-            @board[1][0].is_a?(Integer) == true ? @board[1][0] = symbol : switchPlayer(error)
+            @board[1][0].is_a?(Integer) == true ? @board[1][0] = symbol : squareUnavailable
         when 5
-            @board[1][1].is_a?(Integer) == true ? @board[1][1] = symbol : switchPlayer(error)
+            @board[1][1].is_a?(Integer) == true ? @board[1][1] = symbol : squareUnavailable
         when 6
-            @board[1][2].is_a?(Integer) == true ? @board[1][2] = symbol : switchPlayer(error)
+            @board[1][2].is_a?(Integer) == true ? @board[1][2] = symbol : squareUnavailable
         when 7
-            @board[2][0].is_a?(Integer) == true ? @board[2][0] = symbol : switchPlayer(error)
+            @board[2][0].is_a?(Integer) == true ? @board[2][0] = symbol : squareUnavailable
         when 8
-            @board[2][1].is_a?(Integer) == true ? @board[2][1] = symbol : switchPlayer(error)
+            @board[2][1].is_a?(Integer) == true ? @board[2][1] = symbol : squareUnavailable
         when 9
-            @board[2][2].is_a?(Integer) == true ? @board[2][2] = symbol : switchPlayer(error)
+            @board[2][2].is_a?(Integer) == true ? @board[2][2] = symbol : squareUnavailable
         else
             switchPlayer(error = 'invalid')
+        end
     end
+
+    def squareUnavailable
+        if (@gameType == 1 && @current == 1) || @gameType == 1
+            switchPlayer('full')
+        end
     end
 
     def checkWin(board)
